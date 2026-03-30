@@ -200,6 +200,18 @@ In the current situation, it is easy to do the wrong thing, and difficult to do 
 
 ---
 
+### Why This Belongs to the Standard Library?
+
+The core problem outlined here is essentially jurisdictional: the naive solution of overloading
+the math functions in the `std` namespace is undefined behaviour and the alternative solutions
+are less satisfactory. This proposal cannot be implemented by users and the bridge between the 
+`std` namespace and user-defined namespace must therefore be built from within the Standard Library.
+
+Without this facility, each library has to implement their own partial bridge, resulting in
+duplicated code and no universal solution.
+
+---
+
 ## Proposed Direction
 
 We propose the introduction of a `std::math` sub-namespace containing ADL-aware
@@ -305,6 +317,27 @@ would.
 
 ---
 
+### `std::math` namespace
+
+In the code illustration above, the CPO is defined in a new sub-namespace of `std`: `std::math`.
+This is not absolutely necessary to enable the extensibility of math functions, but
+offers several advantages:
+- Reusing the same names as the functions the CPOs refer to such as `abs`, `sqrt`, `sin`, `pow`, `log`, etc. without ambiguity.
+- Clear separation of behaviours: `std` namespace functions are unchanged, working code leveraging them is unaffected;
+`std::math` offers a new, different contract where ADL resolution allows for user-defined extension.
+- Providing a more focused name space that can be leveraged for autocompletion, separate from the numerous prefixed C-compatible versions.
+
+This also seems to follow recent precedents such as `std::ranges::sort` alongside `std::sort`.
+
+If introducing this namespace is considered undesirable, it would be possible to
+introduce the CPO directly in `std` instead, likely with a distinct prefixed name
+(`std::ext_sqrt`).
+Additionally, types defining a conversion to primitive types such as `float` or `double`
+would not be candidate for ADL resolution, as it would risk changing the behaviour
+of existing code.
+
+---
+
 ### Preserving Legacy Behaviour
  
 With this fixture in its own namespace, the legacy behaviour would be preserved safely, but
@@ -345,7 +378,7 @@ namespace someLib
 	auto someFunction(T&& someValue)
 	{
 		// some code...
-		return std::sqrt(std::forward<T&&>(someValue));
+		return std::sqrt(std::forward<T>(someValue));
 	}
 }
 
@@ -426,7 +459,18 @@ The following are explicitly out of scope for this paper at this stage:
  
 - A complete `std::math` namespace covering all `<cmath>` functions
 - Any changes to the existing `std::sqrt` observable behaviour for types already handled 
-by existin `std::sqrt` overloads.
+by existing `std::sqrt` overloads.
+
+---
+ 
+## Suggested Polls
+
+1. Would allowing a mechanism for user-defined extension of mathematical functions be desirable?
+2. Would this group prefer to isolate such a mechanism in its own sub-namespace (e.g. `std::math`)?
+3. Is the compatibility layer in namespace `std` desirable (preserving existing behaviour, while
+allowing extension for opted-in types only)?
+4. Would the committee encourage more work on this topic, especially expanding the scope to more
+functions from `<cmath>`?
  
 ---
  
