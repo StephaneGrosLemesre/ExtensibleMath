@@ -1,6 +1,6 @@
 ---
 title: "Extensible Math Functions for C++"
-document: D4188R0
+document: P4188R0
 date: 2026-03-30
 audience:
   - SG6
