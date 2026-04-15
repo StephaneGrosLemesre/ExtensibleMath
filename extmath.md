@@ -1,6 +1,6 @@
 ---
 title: "Extensible Math Functions for C++"
-document: D0000R0
+document: TBD
 date: 2026-03-30
 audience:
   - LEWG
@@ -11,10 +11,10 @@ author:
 revision: 0
 abstract: |
   This paper proposes a direction for making standard library mathematical functions
-  extensible via a new `std::math` sub-namespace, using `std::math::sqrt` as a
-  representative example. No wording is proposed at this stage. The goal is to gauge
-  committee appetite for the direction before committing to a full proposal covering
-  the entire `<cmath>` surface.
+  extensible via a new `std::math` sub-namespace. We will use `std::math::sqrt` as a
+  representative example of math function. No wording is proposed at this stage.
+  The goal is to gauge committee appetite for the direction before committing to a
+  full proposal covering the entire `<cmath>` surface.
 toc: false
 ---
 
@@ -62,7 +62,7 @@ struct Foo {
 **Requires expressions:**
 
 ```cpp
-template<class T>
+template<typename T>
 concept numeric = requires(T x) {
     { abs(x) };  // requirement fails
 };
@@ -78,9 +78,8 @@ In all of these cases, the programmer faces the same three unsatisfactory choice
 **Option 1: Call `std::` explicitly**
 
 ```cpp
-template<typename A, typename B, typename C>
-MyType(A a, B b, C c)
-    : a(std::sqrt(a)),  // silently breaks extensibility
+MyType(A aSq, B b, C c)
+    : a(std::sqrt(aSq)),  // silently breaks extensibility
       b(b),
       c(std::abs(c))
 {}
@@ -95,11 +94,11 @@ For member initializer lists, this means moving initialization to the constructo
 body:
 
 ```cpp
-MyType(A a, B b, C c)
+MyType(A aSq, B b, C c)
     : b(b)
 {
     using namespace std;
-    this->a = sqrt(a);  // requires a to be default-constructible
+    this->a = sqrt(aSq);  // requires a to be default-constructible
     this->c = abs(c);   // loses const and reference member support
 }
 ```
@@ -116,8 +115,8 @@ template<class T> auto my_sqrt(T&& x) {
     return sqrt(std::forward<T>(x));
 }
 
-MyType(A a, B b, C c)
-    : a(my_sqrt(a)),
+MyType(A aSq, B b, C c)
+    : a(my_sqrt(aSq)),
       b(b),
       c(my_abs(c))
 {}
@@ -174,8 +173,8 @@ is strong evidence both that the need is real and that the solution is well-unde
 A large body of existing generic C++ code calls `std::sqrt` directly, either out
 of habit or because the author was unaware of the ADL idiom. This code silently
 fails to work with user-defined types that provide their own `sqrt` and restricts
-the composability of generic code. There is no practical way for users of such
-libraries to fix this without modifying the library itself.
+the composability of generic code. There is no practical way for users of libraries
+that call `std::sqrt` directly to fix this without modifying the library itself.
 
 ## Teachability
 
@@ -298,9 +297,13 @@ The dispatch priority is explicitly:
 The explicit separation of ADL and `std::sqrt` lookup into distinct steps also
 prevents ambiguity for types with multiple implicit conversions: ADL is checked
 first, and `std::sqrt` only participates if no ADL candidate is found.
+
+The return type is defined by the CPO, allowing for heterogeneous operations (e.g. the square root of 
+4 square meters returning 2 meters). Multi-argument dispatch follows normal overload resolution.
  
 The three concepts `has_member_sqrt`, `has_adl_sqrt`, and `has_std_sqrt` make the
-CPO properly SFINAE-friendly. A `requires` expression such as:
+CPO properly SFINAE-friendly. It allows the following `requires` expression to correctly evaluates 
+to `false` for types that support none of the three dispatch paths:
  
 ```cpp
 template<class T>
@@ -309,15 +312,13 @@ concept has_sqrt = requires(T x) {
 };
 ```
  
-correctly evaluates to `false` for types that support none of the three dispatch
-paths, rather than always appearing satisfied as an unconstrained function template
-would.
 
 ## `std::math` namespace
 
 In the code illustration above, the CPO is defined in a new sub-namespace of `std`: `std::math`.
 This is not absolutely necessary to enable the extensibility of math functions, but
 offers several advantages:
+
 - Reusing the same names as the functions the CPOs refer to such as `abs`, `sqrt`, `sin`, `pow`, `log`, etc. without ambiguity.
 - Clear separation of behaviours: `std` namespace functions are unchanged, working code leveraging them is unaffected;
 `std::math` offers a new, different contract where ADL resolution allows for user-defined extension.
@@ -328,9 +329,27 @@ This also seems to follow recent precedents such as `std::ranges::sort` alongsid
 If introducing this namespace is considered undesirable, it would be possible to
 introduce the CPO directly in `std` instead, likely with a distinct prefixed name
 (`std::ext_sqrt`).
-Additionally, types defining a conversion to primitive types such as `float` or `double`
+In this case, types defining a conversion to primitive types such as `float` or `double`
 would not be candidate for ADL resolution, as it would risk changing the behaviour
 of existing code.
+
+### `std::math` Functions
+
+As mentioned above, a separate namespace is not necessary to achieve the primary goal of this proposal, but it would
+also offer an opportunity to build an alternate, more intuitive and more "C++" interface for math functions.
+
+Currently, math functions are imported from the C language, with all the consequences it carries:
+
+- prefixed functions (most functions exist in 3 versions, for float, double, and long double, sometimes also for integral types and/or complex. `abs` has at least 10 variants.)
+- naming inconsistency with C++ std library (usually, the std library uses underscores as word separators, but C functions don't)
+- no templating
+
+The new `std::math` namespace could be populated with fewer (likely about 3 times fewer at least), more std-lib-consistent functions.
+Rounding functions (`round`, `nearbyint`, `rint`) could be tidied, `fpclassify` redesigned (`std::math::is_nan`, `std::math::is_infinite`, etc.).
+
+Considering there are hundreds of mathematical functions in the std library, the author would like to gauge the committee's appetite
+and general design direction for such an approach before formulating a more complete proposal. See the [Suggested Polls](#suggested-polls) section.
+
 
 ## Preserving Legacy Behaviour
  
@@ -360,10 +379,13 @@ constexpr auto sqrt(T&& x) -> decltype(math::sqrt(std::forward<T>(x)))
  
 } // namespace std
 ```
- 
+
+&nbsp;  
+&nbsp;
+  
 A typical use case is a custom numeric type used with an existing library that
 calls `std::sqrt` directly and cannot be modified:
- 
+
 ```cpp
 // Generic library using std::sqrt directly
 namespace someLib
@@ -393,16 +415,19 @@ inline constexpr bool std::is_math_extensible<mylib::Scalar> = true;
 someLib::someFunction(mylib::Scalar{5.2});	// now works
 ```
  
-The two paths have deliberately different behaviour:
+The `std` and `std::math` versions have deliberately different behaviour:
  
-- `std::sqrt` behaviour is unchanged for all existing types. User-defined types
-that opt-in via `is_math_extensible` are forwarded to the extensible layer.
-- `std::math::sqrt` is **customization first**: member and ADL customizations are
-  preferred, with `std::sqrt` as the fallback. No opt-in is required.
+- `std::sqrt` behaviour is unchanged for all existing types.  
+Only user-defined types that opt-in via `is_math_extensible` are forwarded to 
+the extensible layer.
+
+- `std::math::sqrt` is **customization first**:  
+Member and ADL customizations are preferred, with `std::sqrt` as the fallback.
+No opt-in is required.
 
 
 A proof of concept compiling under GCC, Clang, and MSVC is available at:
-https://godbolt.org/z/cxYTozPrc [@extmath-poc]
+[https://godbolt.org/z/cxYTozPrc](https://godbolt.org/z/cxYTozPrc) [@extmath-poc]
  
 ## Alternative implementation
 If [@P2806R3] (do expressions) 
@@ -455,6 +480,9 @@ by existing `std::sqrt` overloads.
 
 1. Would allowing a mechanism for user-defined extension of mathematical functions be desirable?
 2. Would this group prefer to isolate such a mechanism in its own sub-namespace (e.g. `std::math`)?
+	1. If so, would this group prefer longer more explicit names over consistency with legacy functions (e.g. `fused_multiply_add`, `fused_mul_add`, or `fma`)?
+	2. Does this group have suggestions regarding error handling (`errno`, exceptions, contracts)?
+	3. Does this group have specific wishes in terms of design for a `std::math` set of math functions (legacy design issues)?
 3. Is the compatibility layer in namespace `std` desirable (preserving existing behaviour, while
 allowing extension for opted-in types only)?
 4. Would the committee encourage more work on this topic, especially expanding the scope to more
