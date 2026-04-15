@@ -1,10 +1,11 @@
 ---
 title: "Extensible Math Functions for C++"
-document: TBD
+document: D4188R0
 date: 2026-03-30
 audience:
-  - LEWG
   - SG6
+  - SG18
+  - LEWG
 author:
   - name: Stéphane Gros-Lemesre
     email: stephane.groslemesre@gmail.com
@@ -15,9 +16,9 @@ abstract: |
   representative example of math function. No wording is proposed at this stage.
   The goal is to gauge committee appetite for the direction before committing to a
   full proposal covering the entire `<cmath>` surface.
-toc: false
+toc: true
 ---
-
+\newpage
 # Motivation
 
 ## The Problem
@@ -93,6 +94,10 @@ overload.
 For member initializer lists, this means moving initialization to the constructor
 body:
 
+```{=latex}
+\begin{minipage}{\linewidth}
+```
+
 ```cpp
 MyType(A aSq, B b, C c)
     : b(b)
@@ -102,6 +107,9 @@ MyType(A aSq, B b, C c)
     this->c = abs(c);   // loses const and reference member support
 }
 ```
+```{=latex}
+\end{minipage}
+```
 
 This restores ADL but members can no longer be `const` or
 references, and all members must be default-constructible. Not all contexts can
@@ -110,7 +118,7 @@ be restructured this way.
 **Option 3: Write boilerplate helper functions**
 
 ```cpp
-template<class T> auto my_sqrt(T&& x) {
+template<typename T> auto my_sqrt(T&& x) {
     using std::sqrt;
     return sqrt(std::forward<T>(x));
 }
@@ -130,7 +138,7 @@ cannot rely on this being provided and may need to implement them redundantly to
 range of types. This makes for poor separation of concern.
 
 The existence of multiple widely-used libraries implementing exactly this machinery
-(see Existing Practice below) is evidence that there are real use-cases and that the status quo is 
+(see [Existing Practice](#existing-practice) below) is evidence that there are real use-cases and that the status quo is 
 encouraging unnecessary duplication.
 
 ## Existing Practice
@@ -165,7 +173,7 @@ But the fundamental approach is identical in all three. This independent converg
 is strong evidence both that the need is real and that the solution is well-understood, making this a natural candidate for standardization.
 
 - **nholthaus/units** takes a different approach: it provides `units::math::sqrt` which
-  calls std::sqrt directly on the underlying scalar value, which means it does not enable
+  calls `std::sqrt` directly on the underlying scalar value, which means it does not enable
   ADL resolution and thus does not extend to custom underlying types. [@nholthaus-units]
 
 ## Existing Code
@@ -197,7 +205,7 @@ Arithmetic operators require no such effort: they are defined by the type author
 compose transparently in generic code.
 Math functions should be no different.
 
-In the current situation, it is easy to do the wrong thing, and difficult to do the right one.
+*In the current situation, it is easy to do the wrong thing, and difficult to do the right one.*
 
 ## Why This Belongs to the Standard Library?
 
@@ -236,26 +244,25 @@ The proposed implementation:
  
 ```cpp
 namespace std::math {
- 
 namespace __sqrt {
  
     // Poison pill: prevents unqualified ADL calls from accidentally
     // finding std::math::sqrt during concept checking
     void sqrt(auto) = delete;
  
-    template<class T>
+    template<typename T>
     concept has_member_sqrt = requires(T&& x)
     {
         std::forward<T>(x).sqrt();
     };
  
-    template<class T>
+    template<typename T>
     concept has_adl_sqrt = !has_member_sqrt<T> && requires(T&& x)
     {
         sqrt(std::forward<T>(x)); // ADL only; poison pill blocks std::math::sqrt
     };
  
-    template<class T>
+    template<typename T>
     concept has_std_sqrt = !has_member_sqrt<T> && !has_adl_sqrt<T> && requires(T&& x)
     {
         std::sqrt(std::forward<T>(x));
@@ -263,7 +270,7 @@ namespace __sqrt {
  
     struct __fn
     {
-        template<class T>
+        template<typename T>
         requires has_member_sqrt<T>
               || has_adl_sqrt<T>
               || has_std_sqrt<T>
@@ -283,7 +290,6 @@ namespace __sqrt {
 inline namespace __cpo {
     inline constexpr __sqrt::__fn sqrt{};
 }
- 
 } // namespace std::math
 ```
 
@@ -306,7 +312,7 @@ CPO properly SFINAE-friendly. It allows the following `requires` expression to c
 to `false` for types that support none of the three dispatch paths:
  
 ```cpp
-template<class T>
+template<typename T>
 concept has_sqrt = requires(T x) {
     std::math::sqrt(x);
 };
@@ -365,12 +371,12 @@ namespace std {
  
 // Opt-in trait for the compatibility forwarding layer.
 // Users specialise this for their own types.
-template<class T>
+template<typename T>
 inline constexpr bool is_math_extensible = false;
  
 // Forward to the extensible layer for opted-in types
 // outside the legacy domain.
-template<class T>
+template<typename T>
 constexpr auto sqrt(T&& x) -> decltype(math::sqrt(std::forward<T>(x)))
     requires is_math_extensible<std::remove_cvref_t<T>>
 {
