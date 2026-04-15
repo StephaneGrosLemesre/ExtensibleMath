@@ -39,3 +39,7 @@
 
 # debug information files
 *.dwo
+
+# Pdf formatter
+wg21/
+wg21-venv/*

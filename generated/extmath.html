@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="mpark/wg21" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-03-30" />
+  <title>Extensible Math Functions for C++</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+      div.csl-block{margin-left: 1.5em;}
+      ul.task-list{list-style: none;}
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {  background-color: #f6f8fa; }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span { } /* Normal */
+      code span.al { color: #ff0000; } /* Alert */
+      code span.an { } /* Annotation */
+      code span.at { } /* Attribute */
+      code span.bn { color: #9f6807; } /* BaseN */
+      code span.bu { color: #9f6807; } /* BuiltIn */
+      code span.cf { color: #00607c; } /* ControlFlow */
+      code span.ch { color: #9f6807; } /* Char */
+      code span.cn { } /* Constant */
+      code span.co { color: #008000; font-style: italic; } /* Comment */
+      code span.cv { color: #008000; font-style: italic; } /* CommentVar */
+      code span.do { color: #008000; } /* Documentation */
+      code span.dt { color: #00607c; } /* DataType */
+      code span.dv { color: #9f6807; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #9f6807; } /* Float */
+      code span.fu { } /* Function */
+      code span.im { } /* Import */
+      code span.in { color: #008000; } /* Information */
+      code span.kw { color: #00607c; } /* Keyword */
+      code span.op { color: #af1915; } /* Operator */
+      code span.ot { } /* Other */
+      code span.pp { color: #6f4e37; } /* Preprocessor */
+      code span.re { } /* RegionMarker */
+      code span.sc { color: #9f6807; } /* SpecialChar */
+      code span.ss { color: #9f6807; } /* SpecialString */
+      code span.st { color: #9f6807; } /* String */
+      code span.va { } /* Variable */
+      code span.vs { color: #9f6807; } /* VerbatimString */
+      code span.wa { color: #008000; font-weight: bold; } /* Warning */
+      code.diff {color: #898887}
+      code.diff span.va {color: #006e28}
+      code.diff span.st {color: #bf0303}
+  </style>
+  <style type="text/css">
+body {
+margin: 5em;
+font-family: serif;
+
+hyphens: auto;
+line-height: 1.35;
+text-align: justify;
+
+-webkit-text-size-adjust: none;
+-moz-text-size-adjust: none;
+text-size-adjust: none;
+}
+@media screen and (max-width: 30em) {
+body {
+margin: 1.5em;
+}
+}
+div.wrapper {
+max-width: 60em;
+margin: auto;
+}
+ul {
+list-style-type: none;
+padding-left: 2em;
+margin-top: -0.2em;
+margin-bottom: -0.2em;
+}
+a {
+text-decoration: none;
+color: #4183C4;
+}
+a.hidden_link {
+text-decoration: none;
+color: inherit;
+}
+li {
+margin-top: 0.6em;
+margin-bottom: 0.6em;
+}
+h1, h2, h3, h4 {
+position: relative;
+line-height: 1;
+}
+a.self-link {
+position: absolute;
+top: 0;
+left: calc(-1 * (3.5rem - 26px));
+width: calc(3.5rem - 26px);
+height: 2em;
+text-align: center;
+border: none;
+transition: opacity .2s;
+opacity: .5;
+font-family: sans-serif;
+font-weight: normal;
+font-size: 83%;
+}
+a.self-link:hover { opacity: 1; }
+a.self-link::before { content: "§"; }
+ul > li:before {
+content: "\2014";
+position: absolute;
+margin-left: -1.5em;
+}
+:target { background-color: #C9FBC9; }
+:target .codeblock { background-color: #C9FBC9; }
+:target ul { background-color: #C9FBC9; }
+.abbr_ref { float: right; }
+.folded_abbr_ref { float: right; }
+:target .folded_abbr_ref { display: none; }
+:target .unfolded_abbr_ref { float: right; display: inherit; }
+.unfolded_abbr_ref { display: none; }
+.secnum { display: inline-block; min-width: 35pt; }
+.header-section-number { display: inline-block; min-width: 35pt; }
+.annexnum { display: block; }
+div.sourceLinkParent {
+float: right;
+}
+a.sourceLink {
+position: absolute;
+opacity: 0;
+margin-left: 10pt;
+}
+a.sourceLink:hover {
+opacity: 1;
+}
+a.itemDeclLink {
+position: absolute;
+font-size: 75%;
+text-align: right;
+width: 5em;
+opacity: 0;
+}
+a.itemDeclLink:hover { opacity: 1; }
+span.marginalizedparent {
+position: relative;
+left: -5em;
+}
+li span.marginalizedparent { left: -7em; }
+li ul > li span.marginalizedparent { left: -9em; }
+li ul > li ul > li span.marginalizedparent { left: -11em; }
+li ul > li ul > li ul > li span.marginalizedparent { left: -13em; }
+div.footnoteNumberParent {
+position: relative;
+left: -4.7em;
+}
+a.marginalized {
+position: absolute;
+font-size: 75%;
+text-align: right;
+width: 5em;
+}
+a.enumerated_item_num {
+position: relative;
+left: -3.5em;
+display: inline-block;
+margin-right: -3em;
+text-align: right;
+width: 3em;
+}
+div.para { margin-bottom: 0.6em; margin-top: 0.6em; text-align: justify; }
+div.section { text-align: justify; }
+div.sentence { display: inline; }
+span.indexparent {
+display: inline;
+position: relative;
+float: right;
+right: -1em;
+}
+a.index {
+position: absolute;
+display: none;
+}
+a.index:before { content: "⟵"; }
+
+a.index:target {
+display: inline;
+}
+.indexitems {
+margin-left: 2em;
+text-indent: -2em;
+}
+div.itemdescr {
+margin-left: 3em;
+}
+.bnf {
+font-family: serif;
+margin-left: 40pt;
+margin-top: 0.5em;
+margin-bottom: 0.5em;
+}
+.ncbnf {
+font-family: serif;
+margin-top: 0.5em;
+margin-bottom: 0.5em;
+margin-left: 40pt;
+}
+.ncsimplebnf {
+font-family: serif;
+font-style: italic;
+margin-top: 0.5em;
+margin-bottom: 0.5em;
+margin-left: 40pt;
+background: inherit; 
+}
+span.textnormal {
+font-style: normal;
+font-family: serif;
+white-space: normal;
+display: inline-block;
+}
+span.rlap {
+display: inline-block;
+width: 0px;
+}
+span.descr { font-style: normal; font-family: serif; }
+span.grammarterm { font-style: italic; }
+span.term { font-style: italic; }
+span.terminal { font-family: monospace; font-style: normal; }
+span.nonterminal { font-style: italic; }
+span.tcode { font-family: monospace; font-style: normal; }
+span.textbf { font-weight: bold; }
+span.textsc { font-variant: small-caps; }
+a.nontermdef { font-style: italic; font-family: serif; }
+span.emph { font-style: italic; }
+span.techterm { font-style: italic; }
+span.mathit { font-style: italic; }
+span.mathsf { font-family: sans-serif; }
+span.mathrm { font-family: serif; font-style: normal; }
+span.textrm { font-family: serif; }
+span.textsl { font-style: italic; }
+span.mathtt { font-family: monospace; font-style: normal; }
+span.mbox { font-family: serif; font-style: normal; }
+span.ungap { display: inline-block; width: 2pt; }
+span.textit { font-style: italic; }
+span.texttt { font-family: monospace; }
+span.tcode_in_codeblock { font-family: monospace; font-style: normal; }
+span.phantom { color: white; }
+
+span.math { font-style: normal; }
+span.mathblock {
+display: block;
+margin-left: auto;
+margin-right: auto;
+margin-top: 1.2em;
+margin-bottom: 1.2em;
+text-align: center;
+}
+span.mathalpha {
+font-style: italic;
+}
+span.synopsis {
+font-weight: bold;
+margin-top: 0.5em;
+display: block;
+}
+span.definition {
+font-weight: bold;
+display: block;
+}
+.codeblock {
+margin-left: 1.2em;
+line-height: 127%;
+}
+.outputblock {
+margin-left: 1.2em;
+line-height: 127%;
+}
+div.itemdecl {
+margin-top: 2ex;
+}
+code.itemdeclcode {
+white-space: pre;
+display: block;
+}
+span.textsuperscript {
+vertical-align: super;
+font-size: smaller;
+line-height: 0;
+}
+.footnotenum { vertical-align: super; font-size: smaller; line-height: 0; }
+.footnote {
+font-size: small;
+margin-left: 2em;
+margin-right: 2em;
+margin-top: 0.6em;
+margin-bottom: 0.6em;
+}
+div.minipage {
+display: inline-block;
+margin-right: 3em;
+}
+div.numberedTable {
+text-align: center;
+margin: 2em;
+}
+div.figure {
+text-align: center;
+margin: 2em;
+}
+table {
+border: 1px solid black;
+border-collapse: collapse;
+margin-left: auto;
+margin-right: auto;
+margin-top: 0.8em;
+text-align: left;
+hyphens: none; 
+}
+td, th {
+padding-left: 1em;
+padding-right: 1em;
+vertical-align: top;
+}
+td.empty {
+padding: 0px;
+padding-left: 1px;
+}
+td.left {
+text-align: left;
+}
+td.right {
+text-align: right;
+}
+td.center {
+text-align: center;
+}
+td.justify {
+text-align: justify;
+}
+td.border {
+border-left: 1px solid black;
+}
+tr.rowsep, td.cline {
+border-top: 1px solid black;
+}
+tr.even, tr.odd {
+border-bottom: 1px solid black;
+}
+tr.capsep {
+border-top: 3px solid black;
+border-top-style: double;
+}
+tr.header {
+border-bottom: 3px solid black;
+border-bottom-style: double;
+}
+th {
+border-bottom: 1px solid black;
+}
+span.centry {
+font-weight: bold;
+}
+div.table {
+display: block;
+margin-left: auto;
+margin-right: auto;
+text-align: center;
+width: 90%;
+}
+span.indented {
+display: block;
+margin-left: 2em;
+margin-bottom: 1em;
+margin-top: 1em;
+}
+ol.enumeratea { list-style-type: none; background: inherit; }
+ol.enumerate { list-style-type: none; background: inherit; }
+
+code.sourceCode > span { display: inline; }
+</style>
+  <link href="data:image/x-icon;base64,AAABAAIAEBAAAAEAIABoBAAAJgAAACAgAAABACAAqBAAAI4EAAAoAAAAEAAAACAAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AIJEAACCRAAAgkQAAIJEAACCRAAAgkQAVoJEAN6CRADegkQAWIJEAACCRAAAgkQAAIJEAACCRAAA////AP///wCCRAAAgkQAAIJEAACCRAAsgkQAvoJEAP+CRAD/gkQA/4JEAP+CRADAgkQALoJEAACCRAAAgkQAAP///wD///8AgkQAAIJEABSCRACSgkQA/IJEAP99PQD/dzMA/3czAP99PQD/gkQA/4JEAPyCRACUgkQAFIJEAAD///8A////AHw+AFiBQwDqgkQA/4BBAP9/PxP/uZd6/9rJtf/bybX/upd7/39AFP+AQQD/gkQA/4FDAOqAQgBc////AP///wDKklv4jlEa/3o7AP+PWC//8+3o///////////////////////z7un/kFox/35AAP+GRwD/mVYA+v///wD///8A0Zpk+NmibP+0d0T/8evj///////+/fv/1sKz/9bCs//9/fr//////+/m2/+NRwL/nloA/5xYAPj///8A////ANKaZPjRmGH/5cKh////////////k149/3UwAP91MQD/lmQ//86rhv+USg3/m1YA/5hSAP+bVgD4////AP///wDSmmT4zpJY/+/bx///////8+TV/8mLT/+TVx//gkIA/5lVAP+VTAD/x6B//7aEVv/JpH7/s39J+P///wD///8A0ppk+M6SWP/u2sf///////Pj1f/Nj1T/2KFs/8mOUv+eWhD/lEsA/8aee/+0glT/x6F7/7J8Rvj///8A////ANKaZPjRmGH/48Cf///////+/v7/2qt//82PVP/OkFX/37KJ/86siv+USg7/mVQA/5hRAP+bVgD4////AP///wDSmmT40ppk/9CVXP/69O////////7+/v/x4M//8d/P//7+/f//////9u7n/6tnJf+XUgD/nFgA+P///wD///8A0ppk+NKaZP/RmWL/1qNy//r07///////////////////////+vXw/9akdP/Wnmn/y5FY/6JfFvj///8A////ANKaZFTSmmTo0ppk/9GYYv/Ql1//5cWm//Hg0P/x4ND/5cWm/9GXYP/RmGH/0ppk/9KaZOjVnmpY////AP///wDSmmQA0ppkEtKaZI7SmmT60ppk/9CWX//OkVb/zpFW/9CWX//SmmT/0ppk/NKaZJDSmmQS0ppkAP///wD///8A0ppkANKaZADSmmQA0ppkKtKaZLrSmmT/0ppk/9KaZP/SmmT/0ppkvNKaZCrSmmQA0ppkANKaZAD///8A////ANKaZADSmmQA0ppkANKaZADSmmQA0ppkUtKaZNzSmmTc0ppkVNKaZADSmmQA0ppkANKaZADSmmQA////AP5/AAD4HwAA4AcAAMADAACAAQAAgAEAAIABAACAAQAAgAEAAIABAACAAQAAgAEAAMADAADgBwAA+B8AAP5/AAAoAAAAIAAAAEAAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AP///wCCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAAyCRACMgkQA6oJEAOqCRACQgkQAEIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAAA////AP///wD///8A////AIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRABigkQA5oJEAP+CRAD/gkQA/4JEAP+CRADqgkQAZoJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAAD///8A////AP///wD///8AgkQAAIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAA4gkQAwoJEAP+CRAD/gkQA/4JEAP+CRAD/gkQA/4JEAP+CRAD/gkQAxIJEADyCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAAAgkQAAP///wD///8A////AP///wCCRAAAgkQAAIJEAACCRAAAgkQAAIJEAACCRAAWgkQAmIJEAP+CRAD/gkQA/4JEAP+CRAD/gkQA/4JEAP+CRAD/gkQA/4JEAP+CRAD/gkQA/4JEAJyCRAAYgkQAAIJEAACCRAAAgkQAAIJEAACCRAAA////AP///wD///8A////AIJEAACCRAAAgkQAAIJEAACCRAAAgkQAdIJEAPCCRAD/gkQA/4JEAP+CRAD/gkQA/4JEAP+CRAD/gkQA/4JEAP+CRAD/gkQA/4JEAP+CRAD/gkQA/4JEAPSCRAB4gkQAAIJEAACCRAAAgkQAAIJEAAD///8A////AP///wD///8AgkQAAIJEAACCRAAAgkQASoJEANKCRAD/gkQA/4JEAP+CRAD/g0YA/39AAP9zLgD/bSQA/2shAP9rIQD/bSQA/3MuAP9/PwD/g0YA/4JEAP+CRAD/gkQA/4JEAP+CRADUgkQAToJEAACCRAAAgkQAAP///wD///8A////AP///wB+PwAAgkUAIoJEAKiCRAD/gkQA/4JEAP+CRAD/hEcA/4BBAP9sIwD/dTAA/5RfKv+viF7/vp56/76ee/+wiF7/lWAr/3YxAP9sIwD/f0AA/4RHAP+CRAD/gkQA/4JEAP+CRAD/gkQArIJEACaBQwAA////AP///wD///8A////AIBCAEBzNAD6f0EA/4NFAP+CRAD/gkQA/4VIAP92MwD/bSUA/6N1Tv/ezsL/////////////////////////////////38/D/6V3Uv9uJgD/dTEA/4VJAP+CRAD/gkQA/4JEAP+BQwD/fUAA/4FDAEj///8A////AP///wD///8AzJRd5qBlKf91NgD/dDUA/4JEAP+FSQD/cy4A/3YyAP/PuKP//////////////////////////////////////////////////////9K7qP94NQD/ciwA/4VJAP+CRAD/fkEA/35BAP+LSwD/mlYA6v///wD///8A////AP///wDdpnL/4qx3/8KJUv+PUhf/cTMA/3AsAP90LgD/4dK+/////////////////////////////////////////////////////////////////+TYxf91MAD/dTIA/31CAP+GRwD/llQA/6FcAP+gWwD8////AP///wD///8A////ANGZY/LSm2X/4ap3/92mcP+wdT3/byQA/8mwj////////////////////////////////////////////////////////////////////////////+LYxv9zLgP/jUoA/59bAP+hXAD/nFgA/5xYAPL///8A////AP///wD///8A0ppk8tKaZP/RmWL/1p9q/9ubXv/XqXj////////////////////////////7+fD/vZyG/6BxS/+gcUr/vJuE//r37f//////////////////////3MOr/5dQBf+dVQD/nVkA/5xYAP+cWAD/nFgA8v///wD///8A////AP///wDSmmTy0ppk/9KaZP/SmWP/yohJ//jo2P//////////////////////4NTG/4JDFf9lGAD/bSQA/20kAP9kGAD/fz8S/+Xb0f//////5NG9/6txN/+LOgD/m1QA/51aAP+cWAD/m1cA/5xYAP+cWADy////AP///wD///8A////ANKaZPLSmmT/0ppk/8+TWf/Unmv//v37//////////////////////+TWRr/VwsA/35AAP+ERgD/g0UA/4JGAP9lHgD/kFga/8KXX/+TRwD/jT4A/49CAP+VTQD/n10A/5xYAP+OQQD/lk4A/55cAPL///8A////AP///wD///8A0ppk8tKaZP/SmmT/y4tO/92yiP//////////////////////8NnE/8eCQP+rcTT/ez0A/3IyAP98PgD/gEMA/5FSAP+USwD/jj8A/5lUAP+JNwD/yqV2/694Mf+HNQD/jkAA/82rf/+laBj/jT4A8v///wD///8A////AP///wDSmmTy0ppk/9KaZP/LiUr/4byY///////////////////////gupX/0I5P/+Wuev/Lklz/l1sj/308AP+QSwD/ol0A/59aAP+aVQD/k0oA/8yoh///////+fXv/6pwO//Lp3v///////Pr4f+oay7y////AP///wD///8A////ANKaZPLSmmT/0ppk/8uJSv/hvJj//////////////////////+G7l//Jhkb/0ppk/96nc//fqXX/x4xO/6dkFP+QSQD/llEA/5xXAP+USgD/yaOA///////38uv/qG05/8ijdv//////8efb/6ZpLPL///8A////AP///wD///8A0ppk8tKaZP/SmmT/zIxO/9yxh///////////////////////7dbA/8iEQf/Sm2X/0Zlj/9ScZv/eqHf/2KJv/7yAQf+XTgD/iToA/5lSAP+JNgD/yKFv/611LP+HNQD/jT8A/8qmeP+kZRT/jT4A8v///wD///8A////AP///wDSmmTy0ppk/9KaZP/Pk1n/1J5q//78+//////////////////+/fv/1aFv/8iEQv/Tm2b/0ppl/9GZY//Wn2z/1pZc/9eldf/Bl2b/kUcA/4w9AP+OQAD/lUwA/59eAP+cWQD/jT8A/5ZOAP+eXADy////AP///wD///8A////ANKaZPLSmmT/0ppk/9KZY//KiEn/8d/P///////////////////////47+f/05tm/8iCP//KiEj/yohJ/8eCP//RmGH//vfy///////n1sP/rXQ7/4k4AP+TTAD/nVoA/5xYAP+cVwD/nFgA/5xYAPL///8A////AP///wD///8A0ppk8tKaZP/SmmT/0ptl/8uLTf/aq37////////////////////////////+/fz/6c2y/961jv/etY7/6Myx//78+v//////////////////////3MWv/5xXD/+ORAD/mFQA/51ZAP+cWAD/nFgA8v///wD///8A////AP///wDSmmTy0ppk/9KaZP/SmmT/0ppk/8mFRP/s1b//////////////////////////////////////////////////////////////////////////////+PD/0JFU/7NzMv+WUQD/kUsA/5tXAP+dWQDy////AP///wD///8A////ANKaZP/SmmT/0ppk/9KaZP/Sm2X/z5NZ/8yMT//z5NX/////////////////////////////////////////////////////////////////9Ofa/8yNUP/UmGH/36p5/8yTWv+qaSD/kksA/5ROAPz///8A////AP///wD///8A0ppk5NKaZP/SmmT/0ppk/9KaZP/TnGf/zY9T/82OUv/t1sD//////////////////////////////////////////////////////+7Yw//OkFX/zI5R/9OcZ//SmmP/26V0/9ymdf/BhUf/ol8R6P///wD///8A////AP///wDSmmQ80ppk9tKaZP/SmmT/0ppk/9KaZP/TnGj/zpFW/8qJSv/dson/8uHS//////////////////////////////////Lj0//etIv/y4lL/86QVf/TnGj/0ppk/9KaZP/RmWP/05xn/9ymdfjUnWdC////AP///wD///8A////ANKaZADSmmQc0ppkotKaZP/SmmT/0ppk/9KaZP/Tm2b/0Zli/8qJSf/NjlH/16Z3/+G8mP/myKr/5siq/+G8mP/Xp3f/zY5S/8qISf/RmGH/05tm/9KaZP/SmmT/0ppk/9KaZP/SmmSm0pljINWdaQD///8A////AP///wD///8A0ppkANKaZADSmmQA0ppkQtKaZMrSmmT/0ppk/9KaZP/SmmT/0ptl/9GYYf/Nj1P/y4lL/8qISP/KiEj/y4lK/82PU//RmGH/0ptl/9KaZP/SmmT/0ppk/9KaZP/SmmTO0ppkRtKaZADSmmQA0ppkAP///wD///8A////AP///wDSmmQA0ppkANKaZADSmmQA0ppkANKaZGzSmmTu0ppk/9KaZP/SmmT/0ppk/9KaZP/SmmT/0ppk/9KaZP/SmmT/0ppk/9KaZP/SmmT/0ppk/9KaZP/SmmTw0ppkcNKaZADSmmQA0ppkANKaZADSmmQA////AP///wD///8A////ANKaZADSmmQA0ppkANKaZADSmmQA0ppkANKaZBLSmmSQ0ppk/9KaZP/SmmT/0ppk/9KaZP/SmmT/0ppk/9KaZP/SmmT/0ppk/9KaZP/SmmT/0ppklNKaZBTSmmQA0ppkANKaZADSmmQA0ppkANKaZAD///8A////AP///wD///8A0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQy0ppkutKaZP/SmmT/0ppk/9KaZP/SmmT/0ppk/9KaZP/SmmT/0ppkvtKaZDbSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkAP///wD///8A////AP///wDSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkXNKaZODSmmT/0ppk/9KaZP/SmmT/0ppk5NKaZGDSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQA////AP///wD///8A////ANKaZADSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkBtKaZIbSmmTo0ppk6tKaZIrSmmQK0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkANKaZADSmmQA0ppkANKaZAD///8A////AP/8P///+B///+AH//+AAf//AAD//AAAP/AAAA/gAAAHwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA+AAAAfwAAAP/AAAP/8AAP//gAH//+AH///4H////D//" rel="icon" />
+  
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div class="wrapper">
+<header id="title-block-header">
+<h1 class="title" style="text-align:center">Extensible Math Functions
+for C++</h1>
+<table style="border:none;float:right">
+  <tr>
+    <td>Document #:</td>
+    <td>
+      D0000R0
+      [<a href="https://wg21.link/P0000">Latest</a>]
+      [<a href="https://wg21.link/P0000/status">Status</a>]
+    </td>
+  </tr>
+  <tr>
+    <td>Date:</td>
+    <td>2026-03-30</td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top">Project:</td>
+    <td>Programming Language C++</td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top">Audience:</td>
+    <td>
+      LEWG<br>
+      SG6<br>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top">Reply-to:</td>
+    <td>
+      Stéphane Gros-Lemesre<br><stephane.groslemesre@gmail.com><br>
+    </td>
+  </tr>
+</table>
+</header>
+<div style="clear:both">
+<h1 data-number="1" id="extensible-math-functions-for-c"><span class="header-section-number">1</span> Extensible Math Functions for
+C++<a href="#extensible-math-functions-for-c" class="self-link"></a></h1>
+<h2 data-number="1.1" id="abstract"><span class="header-section-number">1.1</span> Abstract<a href="#abstract" class="self-link"></a></h2>
+<p>This paper proposes a direction for making standard library
+mathematical functions extensible via a new
+<code class="sourceCode cpp">std<span class="op">::</span>math</code>
+sub-namespace, using <code class="sourceCode cpp">std<span class="op">::</span>math<span class="op">::</span>sqrt</code>
+as a representative example. No wording is proposed at this stage. The
+goal is to gauge committee appetite for the direction before committing
+to a full proposal covering the entire <code class="sourceCode cpp"><span class="op">&lt;</span>cmath<span class="op">&gt;</span></code>
+surface.</p>
+<hr />
+<h2 data-number="1.2" id="motivation"><span class="header-section-number">1.2</span> Motivation<a href="#motivation" class="self-link"></a></h2>
+<h3 data-number="1.2.1" id="the-problem"><span class="header-section-number">1.2.1</span> The Problem<a href="#the-problem" class="self-link"></a></h3>
+<p>The C++ standard library provides mathematical functions such as
+<code class="sourceCode cpp">sqrt</code> and
+<code class="sourceCode cpp">abs</code> in the
+<code class="sourceCode cpp">std</code> namespace. These functions are
+not customization points: calling <code class="sourceCode cpp">std<span class="op">::</span>sqrt<span class="op">(</span>x<span class="op">)</span></code>
+directly bypasses any user-defined overload, even if one exists for the
+type of <code class="sourceCode cpp">x</code>.</p>
+<p>The idiomatic workaround is to enable ADL via a
+<code class="sourceCode cpp"><span class="kw">using</span></code>
+declaration:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> std<span class="op">::</span>sqrt;</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> sqrt<span class="op">(</span>x<span class="op">)</span>;</span></code></pre></div>
+<p>This allows a user-defined <code class="sourceCode cpp">sqrt</code>
+in the same namespace as <code class="sourceCode cpp">x</code> to be
+found via ADL, while falling back to
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+for built-in types. However, this idiom has a critical limitation: it
+requires a statement, and is therefore unavailable in contexts that only
+accept expressions.</p>
+<hr />
+<p><strong>Constructor member initializer lists:</strong></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>MyType<span class="op">(</span>A aSq, B b, C c<span class="op">)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span> a<span class="op">(</span>sqrt<span class="op">(</span>aSq<span class="op">))</span>,   <span class="co">// std::sqrt not found through conversion</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      b<span class="op">(</span>b<span class="op">)</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      c<span class="op">(</span>abs<span class="op">(</span>c<span class="op">))</span>     <span class="co">// std::abs not found through conversion</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">{}</span></span></code></pre></div>
+<p>The same applies to default member initializers:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Foo <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> x <span class="op">=</span> sqrt<span class="op">(</span>v<span class="op">)</span>;  <span class="co">// std::sqrt not found through conversion</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>;</span></code></pre></div>
+<p><strong>Requires expressions:</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">concept</span> numeric <span class="op">=</span> <span class="kw">requires</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span> abs<span class="op">(</span>x<span class="op">)</span> <span class="op">}</span>;  <span class="co">// requirement fails</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>;</span></code></pre></div>
+<p>There are other, less obvious situations where the same limitation
+applies, such as constant expressions (array size from a new-type) and
+template arguments.</p>
+<hr />
+<p>In all of these cases, the programmer faces the same three
+unsatisfactory choices:</p>
+<p><strong>Option 1: Call
+<code class="sourceCode cpp">std<span class="op">::</span></code>
+explicitly</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">typename</span> A, <span class="kw">typename</span> B, <span class="kw">typename</span> C<span class="op">&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>MyType<span class="op">(</span>A a, B b, C c<span class="op">)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span> a<span class="op">(</span>std<span class="op">::</span>sqrt<span class="op">(</span>a<span class="op">))</span>,  <span class="co">// silently breaks extensibility</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      b<span class="op">(</span>b<span class="op">)</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      c<span class="op">(</span>std<span class="op">::</span>abs<span class="op">(</span>c<span class="op">))</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">{}</span></span></code></pre></div>
+<p>This compiles and works for built-in types, but silently cuts off any
+user-defined overload.</p>
+<p><strong>Option 2: Restructure to allow a statement</strong></p>
+<p>For member initializer lists, this means moving initialization to the
+constructor body:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>MyType<span class="op">(</span>A a, B b, C c<span class="op">)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span> b<span class="op">(</span>b<span class="op">)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">using</span> <span class="kw">namespace</span> std;</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">this</span><span class="op">-&gt;</span>a <span class="op">=</span> sqrt<span class="op">(</span>a<span class="op">)</span>;  <span class="co">// requires a to be default-constructible</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">this</span><span class="op">-&gt;</span>c <span class="op">=</span> abs<span class="op">(</span>c<span class="op">)</span>;   <span class="co">// loses const and reference member support</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This restores ADL but members can no longer be
+<code class="sourceCode cpp"><span class="kw">const</span></code> or
+references, and all members must be default-constructible. Not all
+contexts can be restructured this way.</p>
+<p><strong>Option 3: Write boilerplate helper functions</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span> <span class="kw">auto</span> my_sqrt<span class="op">(</span>T<span class="op">&amp;&amp;</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">using</span> std<span class="op">::</span>sqrt;</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">))</span>;</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>MyType<span class="op">(</span>A a, B b, C c<span class="op">)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span> a<span class="op">(</span>my_sqrt<span class="op">(</span>a<span class="op">))</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      b<span class="op">(</span>b<span class="op">)</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      c<span class="op">(</span>my_abs<span class="op">(</span>c<span class="op">))</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="op">{}</span></span></code></pre></div>
+<p>This restores extensibility but requires every author of generic code
+to write and maintain their own dispatch layer; one wrapper per math
+function, 45+ to be exhaustive. The ownership of these wrappers is
+unclear. Custom numeric-type authors should probably embed them in their
+math function implementations, but authors of generic code using such
+functions cannot rely on this being provided and may need to implement
+them redundantly to support a wider range of types. This makes for poor
+separation of concern.</p>
+<p>The existence of multiple widely-used libraries implementing exactly
+this machinery (see Existing Practice below) is evidence that there are
+real use-cases and that the status quo is encouraging unnecessary
+duplication.</p>
+<hr />
+<h3 data-number="1.2.2" id="existing-practice"><span class="header-section-number">1.2.2</span> Existing Practice<a href="#existing-practice" class="self-link"></a></h3>
+<p>Multiple independent, widely-used C++ libraries have been confronted
+with this problem and have each arrived at their own workaround.</p>
+<p><strong>mp-units</strong>, <strong>Eigen</strong>, and
+<strong>Boost.Units</strong> have all independently converged on the
+same core mechanism: bring
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+into scope and let ADL do the work.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> std<span class="op">::</span>sqrt;</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> sqrt<span class="op">(</span>x<span class="op">)</span>;</span></code></pre></div>
+<p>The surrounding machinery differs:</p>
+<ul>
+<li><p>mp-units adds an explicit member function check. <a href="https://github.com/mpusz/mp-units/blob/b0e72810b983841b260d570b241c52586aa78999/src/core/include/mp-units/framework/representation_concepts.h#L227-L262">[mp-units
+math implementation]</a></p></li>
+<li><p>Eigen wraps the dispatch in a traits struct with SIMD
+specialisations and relies on macros to minimize the duplication between
+different functions. <a href="https://gitlab.com/libeigen/eigen/-/blob/master/Eigen/src/Core/MathFunctions.h">[Eigen
+<code class="sourceCode cpp">sqrt</code> implementation]</a></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define EIGEN_MATHFUNC_IMPL</span><span class="op">(</span>func,<span class="pp"> </span>scalar<span class="op">)</span><span class="pp"> </span>\</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="pp">  </span>Eigen<span class="op">::</span>internal<span class="op">::</span>func<span class="pp">##</span>_impl<span class="op">&lt;</span><span class="kw">typename</span><span class="pp"> </span>\</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="pp">  </span>Eigen<span class="op">::</span>internal<span class="op">::</span>global_math_functions_filtering_base<span class="op">&lt;</span>scalar<span class="op">&gt;::</span>type<span class="op">&gt;</span></span></code></pre></div></li>
+<li><p>Boost.Units applies the pattern to the inner value of a quantity
+type. <a href="https://github.com/boostorg/units/blob/develop/include/boost/units/cmath.hpp">[Boost.Units
+<code class="sourceCode cpp">sqrt</code>]</a></p></li>
+</ul>
+<p>But the fundamental approach is identical in all three. This
+independent convergence on the same pattern is strong evidence both that
+the need is real and that the solution is well-understood, making this a
+natural candidate for standardization.</p>
+<ul>
+<li><strong>nholthaus/units</strong> takes a different approach: it
+provides <code class="sourceCode cpp">units<span class="op">::</span>math<span class="op">::</span>sqrt</code>
+which calls std::sqrt directly on the underlying scalar value, which
+means it does not enable ADL resolution and thus does not extend to
+custom underlying types. <a href="https://github.com/nholthaus/units/blob/578ac4ff8b0e96af8d87dd6b20357522038ccbb3/include/units.h#L4645">[nholthaus/units
+<code class="sourceCode cpp">math<span class="op">::</span>sqrt</code>]</a></li>
+</ul>
+<hr />
+<h3 data-number="1.2.3" id="existing-code"><span class="header-section-number">1.2.3</span> Existing Code<a href="#existing-code" class="self-link"></a></h3>
+<p>A large body of existing generic C++ code calls
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+directly, either out of habit or because the author was unaware of the
+ADL idiom. This code silently fails to work with user-defined types that
+provide their own <code class="sourceCode cpp">sqrt</code> and restricts
+the composability of generic code. There is no practical way for users
+of such libraries to fix this without modifying the library itself.</p>
+<hr />
+<h3 data-number="1.2.4" id="teachability"><span class="header-section-number">1.2.4</span> Teachability<a href="#teachability" class="self-link"></a></h3>
+<p>The <code class="sourceCode cpp"><span class="kw">using</span> std<span class="op">::</span>sqrt; sqrt<span class="op">(</span>x<span class="op">)</span>;</code>
+idiom is specialist knowledge. The <a href="https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines.html">C++
+Core Guidelines</a> discuss ADL in the context of operators and
+<code class="sourceCode cpp">swap</code>, but do not provide explicit
+guidance on its application to math functions. An intermediate C++
+programmer following the guidelines would have no reason to know this
+pattern is necessary. Calling <code class="sourceCode cpp">std<span class="op">::</span>sqrt<span class="op">(</span>x<span class="op">)</span></code>
+looks correct and compiles cleanly, but breaks extensibility for custom
+types.</p>
+<p>The following exchange from <a href="https://github.com/nholthaus/units/issues/39#issuecomment-270918812">nholthaus/units
+GitHub issue #39</a> is instructive. A user reports that generic
+algorithms using ADL-found math functions do not work with unit types,
+and the library author responds:</p>
+<blockquote>
+<p><em>“Honestly, I guess I just never use ADL because I pretty much
+exclusively use fully qualified namespaces in my code, and I didn’t put
+thought into it.”</em></p>
+</blockquote>
+<p>This should not be surprising. The responsibility of making custom
+types work intuitively should belong to their authors, not to their
+users or third-party. It takes conscious effort for a generic library
+author to anticipate the needs for wrappers of hypothetical custom types
+and explicitly provide support for them. Arithmetic operators require no
+such effort: they are defined by the type author and compose
+transparently in generic code. Math functions should be no
+different.</p>
+<p>In the current situation, it is easy to do the wrong thing, and
+difficult to do the right one.</p>
+<hr />
+<h3 data-number="1.2.5" id="why-this-belongs-to-the-standard-library"><span class="header-section-number">1.2.5</span> Why This Belongs to the
+Standard Library?<a href="#why-this-belongs-to-the-standard-library" class="self-link"></a></h3>
+<p>The core problem outlined here is essentially jurisdictional: the
+naive solution of overloading the math functions in the
+<code class="sourceCode cpp">std</code> namespace is undefined behaviour
+and the alternative solutions are less satisfactory. This proposal
+cannot be implemented by users and the bridge between the
+<code class="sourceCode cpp">std</code> namespace and user-defined
+namespace must therefore be built from within the Standard Library.</p>
+<p>Without this facility, each library has to implement their own
+partial bridge, resulting in duplicated code and no universal
+solution.</p>
+<hr />
+<h2 data-number="1.3" id="proposed-direction"><span class="header-section-number">1.3</span> Proposed Direction<a href="#proposed-direction" class="self-link"></a></h2>
+<p>We propose the introduction of a
+<code class="sourceCode cpp">std<span class="op">::</span>math</code>
+sub-namespace containing ADL-aware wrappers for <code class="sourceCode cpp"><span class="op">&lt;</span>cmath<span class="op">&gt;</span></code>
+functions. For concision, we will be using
+<code class="sourceCode cpp">sqrt</code> as the representative example
+in this section.</p>
+<p>The sub-namespace is introduced to guarantee that existing code is
+unaffected by this change. A compatibility layer for
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code> is
+also proposed further down.</p>
+<h3 data-number="1.3.1" id="stdmathsqrt-as-a-customization-point-object"><span class="header-section-number">1.3.1</span> <code class="sourceCode cpp">std<span class="op">::</span>math<span class="op">::</span>sqrt</code>
+as a Customization Point Object<a href="#stdmathsqrt-as-a-customization-point-object" class="self-link"></a></h3>
+<p>Rather than a plain function template, <code class="sourceCode cpp">std<span class="op">::</span>math<span class="op">::</span>sqrt</code>
+is proposed as a Customization Point Object (CPO) — a
+<code class="sourceCode cpp"><span class="kw">constexpr</span></code>
+global function object whose <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">()</span></code>
+performs the dispatch. This design, established by the Ranges library
+(<code class="sourceCode cpp">std<span class="op">::</span>ranges<span class="op">::</span>begin</code>,
+<code class="sourceCode cpp">std<span class="op">::</span>ranges<span class="op">::</span>swap</code>
+etc.), offers these two advantages:</p>
+<ul>
+<li>The CPO cannot be found by ADL on user types, since it is an object
+rather than a function. Calling <code class="sourceCode cpp">std<span class="op">::</span>math<span class="op">::</span>sqrt<span class="op">(</span>x<span class="op">)</span></code>
+always invokes the CPO’s <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">()</span></code>
+explicitly, preventing accidental interception.</li>
+<li>The <code class="sourceCode cpp"><span class="kw">operator</span><span class="op">()</span></code>
+can be constrained, making the CPO SFINAE-friendly and allowing it to be
+used correctly inside
+<code class="sourceCode cpp"><span class="kw">requires</span></code>
+expressions and concepts.</li>
+</ul>
+<p>The proposed implementation:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> std<span class="op">::</span>math <span class="op">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> __sqrt <span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Poison pill: prevents unqualified ADL calls from accidentally</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// finding std::math::sqrt during concept checking</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> sqrt<span class="op">(</span><span class="kw">auto</span><span class="op">)</span> <span class="op">=</span> <span class="kw">delete</span>;</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">concept</span> has_member_sqrt <span class="op">=</span> <span class="kw">requires</span><span class="op">(</span>T<span class="op">&amp;&amp;</span> x<span class="op">)</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">).</span>sqrt<span class="op">()</span>;</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span>;</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">concept</span> has_adl_sqrt <span class="op">=</span> <span class="op">!</span>has_member_sqrt<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="kw">requires</span><span class="op">(</span>T<span class="op">&amp;&amp;</span> x<span class="op">)</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">))</span>; <span class="co">// ADL only; poison pill blocks std::math::sqrt</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span>;</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">concept</span> has_std_sqrt <span class="op">=</span> <span class="op">!</span>has_member_sqrt<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>has_adl_sqrt<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">&amp;&amp;</span> <span class="kw">requires</span><span class="op">(</span>T<span class="op">&amp;&amp;</span> x<span class="op">)</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>        std<span class="op">::</span>sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">))</span>;</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span>;</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __fn</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>        <span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>        <span class="kw">requires</span> has_member_sqrt<span class="op">&lt;</span>T<span class="op">&gt;</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>              <span class="op">||</span> has_adl_sqrt<span class="op">&lt;</span>T<span class="op">&gt;</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>              <span class="op">||</span> has_std_sqrt<span class="op">&lt;</span>T<span class="op">&gt;</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>        <span class="kw">constexpr</span> <span class="kw">auto</span> <span class="kw">operator</span><span class="op">()(</span>T<span class="op">&amp;&amp;</span> x<span class="op">)</span> <span class="kw">const</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">constexpr</span> <span class="op">(</span>has_member_sqrt<span class="op">&lt;</span>T<span class="op">&gt;)</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">).</span>sqrt<span class="op">()</span>;       <span class="co">// member customization</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span> <span class="cf">if</span> <span class="kw">constexpr</span> <span class="op">(</span>has_adl_sqrt<span class="op">&lt;</span>T<span class="op">&gt;)</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">))</span>;        <span class="co">// ADL</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> std<span class="op">::</span>sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">))</span>;   <span class="co">// std fallback</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span>;</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="co">// namespace __sqrt</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="kw">inline</span> <span class="kw">namespace</span> __cpo <span class="op">{</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>    <span class="kw">inline</span> <span class="kw">constexpr</span> __sqrt<span class="op">::</span>__fn sqrt<span class="op">{}</span>;</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="co">// namespace std::math</span></span></code></pre></div>
+<p>The dispatch priority is explicitly:</p>
+<ol type="1">
+<li>Member function <code class="sourceCode cpp">x<span class="op">.</span>sqrt<span class="op">()</span></code>
+— unambiguous, not subject to ADL conflicts</li>
+<li>Free function found via ADL in the type’s own namespace</li>
+<li><code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+as the final fallback for all legacy types</li>
+</ol>
+<p>The explicit separation of ADL and
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+lookup into distinct steps also prevents ambiguity for types with
+multiple implicit conversions: ADL is checked first, and
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+only participates if no ADL candidate is found.</p>
+<p>The three concepts
+<code class="sourceCode cpp">has_member_sqrt</code>,
+<code class="sourceCode cpp">has_adl_sqrt</code>, and
+<code class="sourceCode cpp">has_std_sqrt</code> make the CPO properly
+SFINAE-friendly. A
+<code class="sourceCode cpp"><span class="kw">requires</span></code>
+expression such as:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">concept</span> has_sqrt <span class="op">=</span> <span class="kw">requires</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    std<span class="op">::</span>math<span class="op">::</span>sqrt<span class="op">(</span>x<span class="op">)</span>;</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>;</span></code></pre></div>
+<p>correctly evaluates to
+<code class="sourceCode cpp"><span class="kw">false</span></code> for
+types that support none of the three dispatch paths, rather than always
+appearing satisfied as an unconstrained function template would.</p>
+<hr />
+<h3 data-number="1.3.2" id="stdmath-namespace"><span class="header-section-number">1.3.2</span>
+<code class="sourceCode cpp">std<span class="op">::</span>math</code>
+namespace<a href="#stdmath-namespace" class="self-link"></a></h3>
+<p>In the code illustration above, the CPO is defined in a new
+sub-namespace of <code class="sourceCode cpp">std</code>:
+<code class="sourceCode cpp">std<span class="op">::</span>math</code>.
+This is not absolutely necessary to enable the extensibility of math
+functions, but offers several advantages: - Reusing the same names as
+the functions the CPOs refer to such as
+<code class="sourceCode cpp">abs</code>,
+<code class="sourceCode cpp">sqrt</code>,
+<code class="sourceCode cpp">sin</code>,
+<code class="sourceCode cpp">pow</code>,
+<code class="sourceCode cpp">log</code>, etc. without ambiguity. - Clear
+separation of behaviours: <code class="sourceCode cpp">std</code>
+namespace functions are unchanged, working code leveraging them is
+unaffected;
+<code class="sourceCode cpp">std<span class="op">::</span>math</code>
+offers a new, different contract where ADL resolution allows for
+user-defined extension. - Providing a more focused name space that can
+be leveraged for autocompletion, separate from the numerous prefixed
+C-compatible versions.</p>
+<p>This also seems to follow recent precedents such as <code class="sourceCode cpp">std<span class="op">::</span>ranges<span class="op">::</span>sort</code>
+alongside
+<code class="sourceCode cpp">std<span class="op">::</span>sort</code>.</p>
+<p>If introducing this namespace is considered undesirable, it would be
+possible to introduce the CPO directly in
+<code class="sourceCode cpp">std</code> instead, likely with a distinct
+prefixed name (<code class="sourceCode cpp">std<span class="op">::</span>ext_sqrt</code>).
+Additionally, types defining a conversion to primitive types such as
+<code class="sourceCode cpp"><span class="dt">float</span></code> or
+<code class="sourceCode cpp"><span class="dt">double</span></code> would
+not be candidate for ADL resolution, as it would risk changing the
+behaviour of existing code.</p>
+<hr />
+<h3 data-number="1.3.3" id="preserving-legacy-behaviour"><span class="header-section-number">1.3.3</span> Preserving Legacy Behaviour<a href="#preserving-legacy-behaviour" class="self-link"></a></h3>
+<p>With this fixture in its own namespace, the legacy behaviour would be
+preserved safely, but to extend the benefits of this approach to code
+calling
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+directly, we additionally propose an opt-in compatibility forwarding
+layer in <code class="sourceCode cpp"><span class="kw">namespace</span> std</code>.
+This compatibility layer prioritizes maintaining the legacy behaviour,
+ensuring legacy code doesn’t change behaviour while allowing custom
+types where safely possible :</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> std <span class="op">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Opt-in trait for the compatibility forwarding layer.</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Users specialise this for their own types.</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="kw">inline</span> <span class="kw">constexpr</span> <span class="dt">bool</span> is_math_extensible <span class="op">=</span> <span class="kw">false</span>;</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Forward to the extensible layer for opted-in types</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">// outside the legacy domain.</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> T<span class="op">&gt;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="kw">auto</span> sqrt<span class="op">(</span>T<span class="op">&amp;&amp;</span> x<span class="op">)</span> <span class="op">-&gt;</span> <span class="kw">decltype</span><span class="op">(</span>math<span class="op">::</span>sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">)))</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">requires</span> is_math_extensible<span class="op">&lt;</span>std<span class="op">::</span>remove_cvref_t<span class="op">&lt;</span>T<span class="op">&gt;&gt;</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> math<span class="op">::</span>sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>x<span class="op">))</span>;</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="co">// namespace std</span></span></code></pre></div>
+<p>A typical use case is a custom numeric type used with an existing
+library that calls
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+directly and cannot be modified:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Generic library using std::sqrt directly</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> someLib</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">template</span><span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">&gt;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">auto</span> someFunction<span class="op">(</span>T<span class="op">&amp;&amp;</span> someValue<span class="op">)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">// some code...</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> std<span class="op">::</span>sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span>T<span class="op">&gt;(</span>someValue<span class="op">))</span>;</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">// User&#39;s custom type, with its own sqrt in its namespace</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> mylib</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> Scalar <span class="op">{</span> <span class="op">...</span> <span class="op">}</span>;</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    Scalar sqrt<span class="op">(</span>Scalar x<span class="op">)</span> <span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">// Opt in to the compatibility layer</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;&gt;</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="kw">inline</span> <span class="kw">constexpr</span> <span class="dt">bool</span> std<span class="op">::</span>is_math_extensible<span class="op">&lt;</span>mylib<span class="op">::</span>Scalar<span class="op">&gt;</span> <span class="op">=</span> <span class="kw">true</span>;</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">// Now where std::sqrt(mylib::Scalar{}) is used in the library, it is</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">// forwarded to mylib::sqrt via std::math::sqrt</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>someLib<span class="op">::</span>someFunction<span class="op">(</span>mylib<span class="op">::</span>Scalar<span class="op">{</span><span class="fl">5.2</span><span class="op">})</span>;  <span class="co">// now works</span></span></code></pre></div>
+<p>The two paths have deliberately different behaviour:</p>
+<ul>
+<li><code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+behaviour is unchanged for all existing types. User-defined types that
+opt-in via <code class="sourceCode cpp">is_math_extensible</code> are
+forwarded to the extensible layer.</li>
+<li><code class="sourceCode cpp">std<span class="op">::</span>math<span class="op">::</span>sqrt</code>
+is <strong>customization first</strong>: member and ADL customizations
+are preferred, with
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code> as
+the fallback. No opt-in is required.</li>
+</ul>
+<p>A proof of concept compiling under GCC, Clang, and MSVC is available
+at: https://godbolt.org/z/cxYTozPrc</p>
+<hr />
+<h3 data-number="1.3.4" id="alternative-implementation"><span class="header-section-number">1.3.4</span> Alternative implementation<a href="#alternative-implementation" class="self-link"></a></h3>
+<p>If <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2025/p2806r3.html">P2806</a>
+(do expressions) and <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2826r2.html">P2826</a>
+(replacement functions) are accepted for C++29, the implementation of
+<code class="sourceCode cpp">std<span class="op">::</span>math<span class="op">::</span>sqrt</code>
+reduces significantly.</p>
+<p>The do expression makes the ADL idiom available in expression
+contexts, and replacement functions provide expression-equivalence
+guarantees. This would allow the entire CPO to be expressed as a single
+declaration, without explicit dispatch concepts or a poison pill. The
+direction proposed here would compose naturally with these future
+language improvements.</p>
+<p>For illustration purposes, the implementation could become as simple
+as:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> std<span class="op">::</span>math</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">static</span> <span class="kw">constexpr</span> <span class="kw">struct</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">using</span> <span class="kw">operator</span><span class="op">()(</span><span class="kw">auto</span><span class="op">&amp;&amp;</span> x<span class="op">)</span> <span class="op">=</span> <span class="op">(</span><span class="cf">do</span> <span class="op">{</span> <span class="kw">using</span> std<span class="op">::</span>sqrt; do_return sqrt<span class="op">(</span>std<span class="op">::</span>forward<span class="op">&lt;</span><span class="kw">decltype</span><span class="op">(</span>x<span class="op">)&gt;(</span>x<span class="op">))</span>; <span class="op">})</span>;</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> sqrt;</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>eliminating layers of inlining context.</p>
+<hr />
+<h2 data-number="1.4" id="scope-of-this-proposal"><span class="header-section-number">1.4</span> Scope of This Proposal<a href="#scope-of-this-proposal" class="self-link"></a></h2>
+<p>This paper deliberately addresses only <code class="sourceCode cpp">std<span class="op">::</span>math<span class="op">::</span>sqrt</code>
+as a proof of concept. The full set of <code class="sourceCode cpp"><span class="op">&lt;</span>cmath<span class="op">&gt;</span></code>
+functions that would eventually need <code class="sourceCode cpp">std<span class="op">::</span>math<span class="op">::</span></code>
+equivalents includes and is not limited to:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><div style="text-align:center">
+<strong>Category</strong>
+</div></th>
+<th><div style="text-align:center">
+<strong>Functions</strong>
+</div></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Power / root</td>
+<td><code class="sourceCode cpp">sqrt</code>,
+<code class="sourceCode cpp">cbrt</code>,
+<code class="sourceCode cpp">pow</code>,
+<code class="sourceCode cpp">hypot</code></td>
+</tr>
+<tr class="even">
+<td>Exponential / logarithmic</td>
+<td><code class="sourceCode cpp">exp</code>,
+<code class="sourceCode cpp">exp2</code>,
+<code class="sourceCode cpp">expm1</code>,
+<code class="sourceCode cpp">log</code>,
+<code class="sourceCode cpp">log2</code>,
+<code class="sourceCode cpp">log10</code>,
+<code class="sourceCode cpp">log1p</code></td>
+</tr>
+<tr class="odd">
+<td>Trigonometric</td>
+<td><code class="sourceCode cpp">sin</code>,
+<code class="sourceCode cpp">cos</code>,
+<code class="sourceCode cpp">tan</code>,
+<code class="sourceCode cpp">asin</code>,
+<code class="sourceCode cpp">acos</code>,
+<code class="sourceCode cpp">atan</code>,
+<code class="sourceCode cpp">atan2</code></td>
+</tr>
+<tr class="even">
+<td>Hyperbolic</td>
+<td><code class="sourceCode cpp">sinh</code>,
+<code class="sourceCode cpp">cosh</code>,
+<code class="sourceCode cpp">tanh</code>,
+<code class="sourceCode cpp">asinh</code>,
+<code class="sourceCode cpp">acosh</code>,
+<code class="sourceCode cpp">atanh</code></td>
+</tr>
+<tr class="odd">
+<td>Rounding</td>
+<td><code class="sourceCode cpp">ceil</code>,
+<code class="sourceCode cpp">floor</code>,
+<code class="sourceCode cpp">trunc</code>,
+<code class="sourceCode cpp">round</code>,
+<code class="sourceCode cpp">nearbyint</code>,
+<code class="sourceCode cpp">rint</code></td>
+</tr>
+<tr class="even">
+<td>Absolute value / sign</td>
+<td><code class="sourceCode cpp">abs</code>,
+<code class="sourceCode cpp">fabs</code>,
+<code class="sourceCode cpp">copysign</code>,
+<code class="sourceCode cpp">signbit</code></td>
+</tr>
+<tr class="odd">
+<td>Floating point</td>
+<td><code class="sourceCode cpp">fmod</code>,
+<code class="sourceCode cpp">remainder</code>,
+<code class="sourceCode cpp">fma</code>,
+<code class="sourceCode cpp">fdim</code>,
+<code class="sourceCode cpp">fmax</code>,
+<code class="sourceCode cpp">fmin</code></td>
+</tr>
+<tr class="even">
+<td>Classification</td>
+<td><code class="sourceCode cpp">isfinite</code>,
+<code class="sourceCode cpp">isinf</code>,
+<code class="sourceCode cpp">isnan</code>,
+<code class="sourceCode cpp">isnormal</code>,
+<code class="sourceCode cpp">fpclassify</code></td>
+</tr>
+</tbody>
+</table>
+<p>The following are explicitly out of scope for this paper at this
+stage:</p>
+<ul>
+<li>A complete
+<code class="sourceCode cpp">std<span class="op">::</span>math</code>
+namespace covering all <code class="sourceCode cpp"><span class="op">&lt;</span>cmath<span class="op">&gt;</span></code>
+functions</li>
+<li>Any changes to the existing
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+observable behaviour for types already handled by existing
+<code class="sourceCode cpp">std<span class="op">::</span>sqrt</code>
+overloads.</li>
+</ul>
+<hr />
+<h2 data-number="1.5" id="suggested-polls"><span class="header-section-number">1.5</span> Suggested Polls<a href="#suggested-polls" class="self-link"></a></h2>
+<ol type="1">
+<li>Would allowing a mechanism for user-defined extension of
+mathematical functions be desirable?</li>
+<li>Would this group prefer to isolate such a mechanism in its own
+sub-namespace
+(e.g. <code class="sourceCode cpp">std<span class="op">::</span>math</code>)?</li>
+<li>Is the compatibility layer in namespace
+<code class="sourceCode cpp">std</code> desirable (preserving existing
+behaviour, while allowing extension for opted-in types only)?</li>
+<li>Would the committee encourage more work on this topic, especially
+expanding the scope to more functions from <code class="sourceCode cpp"><span class="op">&lt;</span>cmath<span class="op">&gt;</span></code>?</li>
+</ol>
+<hr />
+<h2 data-number="1.6" id="references"><span class="header-section-number">1.6</span> References<a href="#references" class="self-link"></a></h2>
+<ul>
+<li>mp-units math dispatch implementation:
+https://github.com/mpusz/mp-units/blob/b0e72810b983841b260d570b241c52586aa78999/src/core/include/mp-units/framework/representation_concepts.h#L227-L262</li>
+<li>nholthaus/units library: https://github.com/nholthaus/units</li>
+<li>nholthaus/units issue #39 (ADL and math functions):
+https://github.com/nholthaus/units/issues/39</li>
+<li>Eigen math function implementation:
+https://gitlab.com/libeigen/eigen/-/blob/master/Eigen/src/Core/MathFunctions.h</li>
+<li>Boost.Units sqrt implementation:
+https://github.com/boostorg/units/blob/develop/include/boost/units/cmath.hpp</li>
+<li>Proof of concept implementation:
+https://godbolt.org/z/cxYTozPrc</li>
+</ul>
+</div>
+</div>
+</body>
+</html>
