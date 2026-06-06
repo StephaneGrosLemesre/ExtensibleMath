@@ -1,0 +1,54 @@
+- Motivation
+	- Problem
+		- Not customizable
+			- unlike operators
+			- limiting for custom types
+				- code that is unaware makes custom types (newtypes) impractical
+					- huge body of such code
+					- NewType/semantic-typing
+				- the `using`-statement workaround
+					- requires a statements
+						- unsatisfactory solutions
+						- per-function boilerplate
+					- ownership of the boilerplate
+					- separation of concern
+					- teachability
+			- limiting for std types as well
+				- simd
+				- linear algebra
+				- unit library
+	- Context
+		- Inherited from C
+			- prefixed functions
+			- ~duplicate
+			- inconsistent naming
+			- teachability
+		- Large body of existing code
+			- untouchable
+- Impact on the Std
+	- Preserving behaviour
+	- solving from within the std-lib
+	- Carving new space
+		- to allow customization
+		- to separate from C
+		- to reuse the same names where appropriate
+		- to help with autocompletion (focused namespace)
+		- to fix a few things
+			- new contract
+		- to improve teachability
+	- Bridging with explicit opt-in
+	- summary (no intrinsic, large surface)
+- Design Decisions
+	- New namespace
+	- clear behaviour separation between `std` and `std::math` (preserving legacy)
+	- CPO-like
+		- No ADL resolution
+		- SFINAE/Concept friendly
+		- alternative implementation
+	- New fixture offers dispatch, but contract owned by the implementation it gets dispatched to.
+		- No guarantee of any kind
+	- Explicit names to avoid confusion
+		- Changing contract to fix legacy is ok.
+			- abs/norm example
+	- One name per operation as much as possible
+- Technical Specification

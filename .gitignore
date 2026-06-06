@@ -43,3 +43,7 @@
 # Pdf formatter
 wg21/
 wg21-venv/*
+
+# Diff files
+*.orig
+*.swp
